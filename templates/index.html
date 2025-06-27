@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulmonary Disease Predictor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #34a853;
+            --danger-color: #ea4335;
+            --warning-color: #fbbc05;
+            --light-bg: #f8f9fa;
+            --dark-bg: #202124;
+            --text-light: #f8f9fa;
+            --text-dark: #202124;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+        }
+
+        .form-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        body.dark-mode .form-card {
+            background-color: #2d2d2d;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        body.dark-mode h2 {
+            color: #8ab4f8;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        body.dark-mode .form-control {
+            background-color: #3c3c3c;
+            border-color: #555;
+            color: var(--text-light);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .help-icon {
+            color: var(--primary-color);
+            margin-left: 0.5rem;
+            cursor: help;
+        }
+
+        body.dark-mode .help-icon {
+            color: #8ab4f8;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .invalid-feedback {
+            color: var(--danger-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .is-invalid {
+            border-color: var(--danger-color) !important;
+        }
+
+        .is-valid {
+            border-color: var(--secondary-color) !important;
+        }
+
+        .valid-feedback {
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .btn:hover {
+            background-color: #0d5bba;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-predict {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-predict::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(45deg);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+
+        .btn-predict:hover::after {
+            left: 100%;
+        }
+
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .result-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        body.dark-mode .result-card {
+            background-color: #2d2d2d;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-success {
+            color: var(--secondary-color);
+        }
+
+        .result-warning {
+            color: var(--warning-color);
+        }
+
+        .result-danger {
+            color: var(--danger-color);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        body.dark-mode .section-title {
+            color: #8ab4f8;
+            border-bottom-color: #444;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .slider-container {
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+        }
+
+        body.dark-mode .slider {
+            background: #555;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .slider-value {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ddd;
+            z-index: 1;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .step.completed {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .btn-nav {
+            max-width: 150px;
+        }
+
+        .explanation {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #f0f7ff;
+            border-radius: 5px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        body.dark-mode .explanation {
+            background-color: #1a3d5c;
+            border-left-color: #8ab4f8;
+        }
+
+        .explanation h4 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        body.dark-mode .explanation h4 {
+            color: #8ab4f8;
+        }
+
+        .explanation ul {
+            padding-left: 1.5rem;
+        }
+
+        .explanation li {
+            margin-bottom: 0.5rem;
+        }
+
+        .auto-fill {
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .auto-fill-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        body.dark-mode .auto-fill-btn {
+            color: #8ab4f8;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="container">
+        <div class="header">
+            <h1>Pulmonary Disease Predictor</h1>
+            <p>Fill in your health information to assess your risk of pulmonary disease</p>
+        </div>
+
+        <div class="form-card">
+            <div class="progress-steps">
+                <div class="step active" id="step1">1</div>
+                <div class="step" id="step2">2</div>
+                <div class="step" id="step3">3</div>
+            </div>
+
+            <form id="predictionForm" action="/predict" method="post">
+                <!-- Personal Information Section -->
+                <div class="form-section active" id="section1">
+                    <h3 class="section-title">Personal Information</h3>
+                    
+                    <div class="auto-fill">
+                        <button type="button" class="auto-fill-btn" id="autoFillBtn">Fill with sample data for testing</button>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" name="age" class="form-control" placeholder="Enter your age" min="1" max="120" required>
+                            <div class="invalid-feedback">Please enter a valid age (1-120)</div>
+                            <div class="valid-feedback">Looks good!</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="gender_male" name="gender" value="1" required>
+                                    <label for="gender_male">Male</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="gender_female" name="gender" value="0">
+                                    <label for="gender_female">Female</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="smoking">
+                                Smoking Status
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Do you currently smoke tobacco products?</span>
+                                </span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="smoking_yes" name="smoking" value="1" required>
+                                    <label for="smoking_yes">Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="smoking_no" name="smoking" value="0">
+                                    <label for="smoking_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="alcohol">
+                                Alcohol Consumption
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Do you regularly consume alcohol?</span>
+                                </span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="alcohol_yes" name="alcohol" value="1" required>
+                                    <label for="alcohol_yes">Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="alcohol_no" name="alcohol" value="0">
+                                    <label for="alcohol_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="family">
+                                Family History of Pulmonary Disease
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Do you have immediate family members with pulmonary disease?</span>
+                                </span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="family_yes" name="family" value="1" required>
+                                    <label for="family_yes">Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="family_no" name="family" value="0">
+                                    <label for="family_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="smoke_history">
+                                Family Smoking History
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Did your parents smoke when you were a child?</span>
+                                </span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="smoke_history_yes" name="smoke_history" value="1" required>
+                                    <label for="smoke_history_yes">Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="smoke_history_no" name="smoke_history" value="0">
+                                    <label for="smoke_history_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nav-buttons">
+                        <button type="button" class="btn btn-nav" disabled>Previous</button>
+                        <button type="button" class="btn btn-nav" id="nextBtn1">Next</button>
+                    </div>
+                </div>
+                
+                <!-- Symptoms Section -->
+                <div class="form-section" id="section2">
+                    <h3 class="section-title">Symptoms & Health Factors</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="breathing">
+                                Breathing Issues
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Do you experience shortness of breath or difficulty breathing?</span>
+                                </span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="breathing_yes" name="breathing" value="1" required>
+                                    <label for="breathing_yes">Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="breathing_no" name="breathing" value="0">
+                                    <label for="breathing_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="chest">
+                                Chest Tightness
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Do you experience tightness or pain in your chest?</span>
+                                </span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="chest_yes" name="chest" value="1" required>
+                                    <label for="chest_yes">Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="chest_no" name="chest" value="0">
+                                    <label for="chest_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="throat">
+                                Throat Discomfort
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Do you frequently have a sore throat or throat irritation?</span>
+                                </span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="throat_yes" name="throat" value="1" required>
+                                    <label for="throat_yes">Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="throat_no" name="throat" value="0">
+                                    <label for="throat_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="finger_discoloration">
+                                Finger Discoloration
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Do you have bluish discoloration of fingers or nails?</span>
+                                </span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="finger_discoloration_yes" name="finger_discoloration" value="1" required>
+                                    <label for="finger_discoloration_yes">Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="finger_discoloration_no" name="finger_discoloration" value="0">
+                                    <label for="finger_discoloration_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="oxygen">
+                                Oxygen Saturation (%)
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Your blood oxygen level (normal is 95-100%)</span>
+                                </span>
+                            </label>
+                            <div class="slider-container">
+                                <input type="range" id="oxygen" name="oxygen" class="slider" min="80" max="100" step="0.1" value="98" required>
+                                <div class="slider-value" id="oxygenValue">98%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="energy">
+                                Energy Level
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Rate your general energy level (0 = very low, 10 = very high)</span>
+                                </span>
+                            </label>
+                            <div class="slider-container">
+                                <input type="range" id="energy" name="energy" class="slider" min="0" max="10" step="0.1" value="7" required>
+                                <div class="slider-value" id="energyValue">7</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nav-buttons">
+                        <button type="button" class="btn btn-nav" id="prevBtn2">Previous</button>
+                        <button type="button" class="btn btn-nav" id="nextBtn2">Next</button>
+                    </div>
+                </div>
+                
+                <!-- Lifestyle & Environment Section -->
+                <div class="form-section" id="section3">
+                    <h3 class="section-title">Lifestyle & Environment</h3>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="pollution">
+                                Exposure to Pollution
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Do you live or work in a highly polluted environment?</span>
+                                </span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="pollution_yes" name="pollution" value="1" required>
+                                    <label for="pollution_yes">Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="pollution_no" name="pollution" value="0">
+                                    <label for="pollution_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="illness">
+                                Long-term Illness
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Do you have any chronic illnesses (e.g., diabetes, heart disease)?</span>
+                                </span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="illness_yes" name="illness" value="1" required>
+                                    <label for="illness_yes">Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="illness_no" name="illness" value="0">
+                                    <label for="illness_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="immune_weak">
+                                Weak Immune System
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Do you get sick often or have a weakened immune system?</span>
+                                </span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="immune_weak_yes" name="immune_weak" value="1" required>
+                                    <label for="immune_weak_yes">Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="immune_weak_no" name="immune_weak" value="0">
+                                    <label for="immune_weak_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="mental_stress">
+                                Mental Stress
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Do you experience high levels of stress regularly?</span>
+                                </span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="mental_stress_yes" name="mental_stress" value="1" required>
+                                    <label for="mental_stress_yes">Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="mental_stress_no" name="mental_stress" value="0">
+                                    <label for="mental_stress_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="stress_immune">
+                                Stress Affects Immunity
+                                <span class="tooltip help-icon">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="tooltiptext">Does stress seem to make you more susceptible to illness?</span>
+                                </span>
+                            </label>
+                            <div class="radio-group">
+                                <div class="radio-option">
+                                    <input type="radio" id="stress_immune_yes" name="stress_immune" value="1" required>
+                                    <label for="stress_immune_yes">Yes</label>
+                                </div>
+                                <div class="radio-option">
+                                    <input type="radio" id="stress_immune_no" name="stress_immune" value="0">
+                                    <label for="stress_immune_no">No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nav-buttons">
+                        <button type="button" class="btn btn-nav" id="prevBtn3">Previous</button>
+                        <button type="submit" class="btn btn-predict" id="predictBtn">
+                            Predict Risk
+                            <span class="spinner" id="spinner"></span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="result-card" id="resultCard">
+            <div class="result-icon" id="resultIcon"></div>
+            <h3 id="resultTitle">Prediction Result</h3>
+            <p id="resultText"></p>
+            <div class="explanation" id="explanation">
+                <h4>Key Factors in This Prediction:</h4>
+                <ul id="factorsList"></ul>
+            </div>
+            <button type="button" class="btn" id="newPredictionBtn" style="margin-top: 1rem;">Start New Prediction</button>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // Check for saved theme preference or use preferred color scheme
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            body.classList.add('dark-mode');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDark = body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+        
+        // Multi-step Form Navigation
+        const nextBtn1 = document.getElementById('nextBtn1');
+        const nextBtn2 = document.getElementById('nextBtn2');
+        const prevBtn2 = document.getElementById('prevBtn2');
+        const prevBtn3 = document.getElementById('prevBtn3');
+        const sections = document.querySelectorAll('.form-section');
+        const steps = document.querySelectorAll('.step');
+        
+        nextBtn1.addEventListener('click', () => {
+            if (validateSection(1)) {
+                sections[0].classList.remove('active');
+                sections[1].classList.add('active');
+                steps[0].classList.remove('active');
+                steps[0].classList.add('completed');
+                steps[1].classList.add('active');
+                window.scrollTo(0, 0);
+            }
+        });
+        
+        nextBtn2.addEventListener('click', () => {
+            if (validateSection(2)) {
+                sections[1].classList.remove('active');
+                sections[2].classList.add('active');
+                steps[1].classList.remove('active');
+                steps[1].classList.add('completed');
+                steps[2].classList.add('active');
+                window.scrollTo(0, 0);
+            }
+        });
+        
+        prevBtn2.addEventListener('click', () => {
+            sections[1].classList.remove('active');
+            sections[0].classList.add('active');
+            steps[1].classList.remove('active');
+            steps[0].classList.add('active');
+            steps[0].classList.remove('completed');
+            window.scrollTo(0, 0);
+        });
+        
+        prevBtn3.addEventListener('click', () => {
+            sections[2].classList.remove('active');
+            sections[1].classList.add('active');
+            steps[2].classList.remove('active');
+            steps[1].classList.add('active');
+            steps[1].classList.remove('completed');
+            window.scrollTo(0, 0);
+        });
+        
+        function validateSection(sectionNum) {
+            let isValid = true;
+            const currentSection = document.getElementById(`section${sectionNum}`);
+            const requiredInputs = currentSection.querySelectorAll('input[required]');
+            
+            requiredInputs.forEach(input => {
+                if (!input.value && input.type !== 'radio') {
+                    input.classList.add('is-invalid');
+                    const feedback = input.nextElementSibling;
+                    if (feedback && feedback.classList.contains('invalid-feedback')) {
+                        feedback.style.display = 'block';
+                    }
+                    isValid = false;
+                } else if (input.type === 'radio') {
+                    const radioGroup = document.querySelectorAll(`input[name="${input.name}"]:checked`);
+                    if (radioGroup.length === 0) {
+                        const firstRadio = document.querySelector(`input[name="${input.name}"]`);
+                        if (firstRadio) {
+                            const formGroup = firstRadio.closest('.form-group');
+                            if (formGroup) {
+                                const feedback = formGroup.querySelector('.invalid-feedback');
+                                if (feedback) {
+                                    feedback.style.display = 'block';
+                                    isValid = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            return isValid;
+        }
+        
+        // Slider Value Display
+        const oxygenSlider = document.getElementById('oxygen');
+        const oxygenValue = document.getElementById('oxygenValue');
+        const energySlider = document.getElementById('energy');
+        const energyValue = document.getElementById('energyValue');
+        
+        oxygenSlider.addEventListener('input', () => {
+            oxygenValue.textContent = `${oxygenSlider.value}%`;
+        });
+        
+        energySlider.addEventListener('input', () => {
+            energyValue.textContent = energySlider.value;
+        });
+        
+        // Form Validation
+        const form = document.getElementById('predictionForm');
+        const inputs = form.querySelectorAll('input');
+        
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.checkValidity()) {
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                    
+                    const invalidFeedback = input.nextElementSibling;
+                    if (invalidFeedback && invalidFeedback.classList.contains('invalid-feedback')) {
+                        invalidFeedback.style.display = 'none';
+                    }
+                    
+                    const validFeedback = input.nextElementSibling;
+                    if (validFeedback && validFeedback.classList.contains('valid-feedback')) {
+                        validFeedback.style.display = 'block';
+                    }
+                }
+            });
+            
+            // For radio buttons
+            if (input.type === 'radio') {
+                input.addEventListener('change', () => {
+                    const radioGroup = document.querySelectorAll(`input[name="${input.name}"]`);
+                    let isChecked = false;
+                    
+                    radioGroup.forEach(radio => {
+                        if (radio.checked) isChecked = true;
+                    });
+                    
+                    if (isChecked) {
+                        const formGroup = input.closest('.form-group');
+                        if (formGroup) {
+                            const feedback = formGroup.querySelector('.invalid-feedback');
+                            if (feedback) {
+                                feedback.style.display = 'none';
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        
+        // Form Submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (validateSection(3)) {
+                const predictBtn = document.getElementById('predictBtn');
+                const spinner = document.getElementById('spinner');
+                
+                predictBtn.disabled = true;
+                spinner.style.display = 'inline-block';
+                
+                // Simulate prediction delay (replace with actual AJAX call)
+                setTimeout(() => {
+                    // This is where you would normally make an AJAX call to your backend
+                    // For demo purposes, we'll simulate a response
+                    const simulatedResponse = {
+                        prediction: Math.random() > 0.5 ? 1 : 0,
+                        probability: (Math.random() * 100).toFixed(1),
+                        factors: [
+                            "Smoking status",
+                            "Low oxygen saturation (92%)",
+                            "Breathing issues reported",
+                            "Family history of pulmonary disease"
+                        ]
+                    };
+                    
+                    displayResult(simulatedResponse);
+                    
+                    predictBtn.disabled = false;
+                    spinner.style.display = 'none';
+                }, 2000);
+            }
+        });
+        
+        // Display Result
+        function displayResult(data) {
+            const resultCard = document.getElementById('resultCard');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultText = document.getElementById('resultText');
+            const factorsList = document.getElementById('factorsList');
+            
+            if (data.prediction === 1) {
+                resultIcon.className = 'result-icon result-warning';
+                resultIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                resultTitle.textContent = 'Pulmonary Disease Risk Detected';
+                resultText.textContent = `Based on your inputs, there is a ${data.probability}% chance you may be at risk for pulmonary disease. Please consult with a healthcare professional.`;
+            } else {
+                resultIcon.className = 'result-icon result-success';
+                resultIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                resultTitle.textContent = 'No Significant Risk Detected';
+                resultText.textContent = `Based on your inputs, there is a ${data.probability}% chance you may be at risk for pulmonary disease. This is considered low risk, but regular check-ups are always recommended.`;
+            }
+            
+            // Clear previous factors
+            factorsList.innerHTML = '';
+            
+            // Add new factors
+            data.factors.forEach(factor => {
+                const li = document.createElement('li');
+                li.textContent = factor;
+                factorsList.appendChild(li);
+            });
+            
+            // Show result card
+            resultCard.style.display = 'block';
+            
+            // Scroll to result
+            resultCard.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // New Prediction Button
+        const newPredictionBtn = document.getElementById('newPredictionBtn');
+        newPredictionBtn.addEventListener('click', () => {
+            // Reset form
+            form.reset();
+            
+            // Reset sliders
+            oxygenSlider.value = 98;
+            oxygenValue.textContent = '98%';
+            energySlider.value = 7;
+            energyValue.textContent = '7';
+            
+            // Reset steps
+            sections.forEach((section, index) => {
+                if (index === 0) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+            
+            steps.forEach((step, index) => {
+                if (index === 0) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+            
+            // Hide result card
+            resultCard.style.display = 'none';
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        });
+        
+        // Auto-fill for testing
+        const autoFillBtn = document.getElementById('autoFillBtn');
+        autoFillBtn.addEventListener('click', () => {
+            // Personal Info
+            document.getElementById('age').value = 45;
+            document.getElementById('gender_male').checked = true;
+            document.getElementById('smoking_yes').checked = true;
+            document.getElementById('alcohol_no').checked = true;
+            document.getElementById('family_yes').checked = true;
+            document.getElementById('smoke_history_yes').checked = true;
+            
+            // Symptoms
+            document.getElementById('breathing_yes').checked = true;
+            document.getElementById('chest_yes').checked = true;
+            document.getElementById('throat_yes').checked = true;
+            document.getElementById('finger_discoloration_no').checked = true;
+            document.getElementById('oxygen').value = 92;
+            document.getElementById('oxygenValue').textContent = '92%';
+            document.getElementById('energy').value = 4;
+            document.getElementById('energyValue').textContent = '4';
+            
+            // Lifestyle
+            document.getElementById('pollution_yes').checked = true;
+            document.getElementById('illness_no').checked = true;
+            document.getElementById('immune_weak_no').checked = true;
+            document.getElementById('mental_stress_yes').checked = true;
+            document.getElementById('stress_immune_yes').checked = true;
+            
+            // Validate all fields
+            const inputs = form.querySelectorAll('input');
+            inputs.forEach(input => {
+                if (input.value || input.checked) {
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                    
+                    const invalidFeedback = input.nextElementSibling;
+                    if (invalidFeedback && invalidFeedback.classList.contains('invalid-feedback')) {
+                        invalidFeedback.style.display = 'none';
+                    }
+                    
+                    const validFeedback = input.nextElementSibling;
+                    if (validFeedback && validFeedback.classList.contains('valid-feedback')) {
+                        validFeedback.style.display = 'block';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
